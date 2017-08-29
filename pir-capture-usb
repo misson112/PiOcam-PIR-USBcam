@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+
+from gpiozero import MotionSensor
+import subprocess
+import time
+import datetime
+import os
+
+pir = MotionSensor(23)
+pic_filepath = "/home/pi/hornetRpiServer/photos/"
+
+def make_folder() :
+ now = datetime.datetime.now()
+ newDirName = pic_filepath + now.strftime("%Y-%m-%d")
+ if not os.path.isdir(newDirName) :
+     os.mkdir(newDirName)
+
+try:
+    print 'PIR Motion Triggered Video Capture'
+    time.sleep(3)
+    print 'Ready'
+
+    while True:
+        while pir.motion_detected:   
+          pic_filename = time.strftime("%Y%m%d_%H%M%S.jpg")
+          os.system("fswebcam --set brightness=50% --jpeg 90 -p YUYV --fps 15 -S 15 -D 5 -r 640x480 -d /dev/video0 --save /home/pi/hornetRpiServer/photos/%Y-%m-%d_%H-%M-%S.jpg")
+          print "Captured %s" % pic_filename
+          time.sleep(10)
+except KeyboardInterrupt:
+    print 'Quit' 
